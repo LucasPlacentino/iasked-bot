@@ -15,9 +15,9 @@ This can be enabled in your [Discord Developer Portal](https://discord.com/devel
 - `BOT_TOKEN` must be put in a `.env` file (like [`.env_template`](/.env_template)), from your bot's settings in the Discord Developer Portal.
 
 ## *️⃣ Versions:
-- [Python](https://github.com/LucasPlacentino/iasked-bot/tree/python) (here)
-- [Javascript](https://github.com/LucasPlacentino/iasked-bot/tree/javascript)
-- [Rust](https://github.com/LucasPlacentino/iasked-bot/tree/rust)
+- [Python](https://github.com/LucasPlacentino/iasked-bot/tree/python) using [_Disnake_](https://github.com/DisnakeDev/disnake) (here)
+- [Javascript](https://github.com/LucasPlacentino/iasked-bot/tree/javascript) using [_Discord.js_](https://github.com/discordjs/discord.js)
+- [Rust](https://github.com/LucasPlacentino/iasked-bot/tree/rust) using [_Serenity_](https://github.com/serenity-rs/serenity)
 
 ## 👤 Author
 [Lucas Placentino](https://github.com/LucasPlacentino)
