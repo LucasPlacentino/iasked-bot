@@ -30,6 +30,7 @@ reduced_texts = ["whoasked", "whoaskedthough", "whoaskedtho"] # add possible typ
 
 class MyClient(disnake.Client):
     async def on_message(self, message: disnake.Message):
+      try:
         print(f"> Received message")
         
         
@@ -44,6 +45,7 @@ class MyClient(disnake.Client):
           print(f"> Replying to message")
           #await message.reply(replies[randint(0,length(replies)], mention_author=True)
           await message.reply(replies[randint(0,length(replies)])
+          await message.add_reaction("🙋")
           return
 
     async def on_ready(self):
