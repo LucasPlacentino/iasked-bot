@@ -12,7 +12,8 @@ Replies "I asked", "I did" or "Me" to any message containing variations of "Who 
 
 This can be enabled in your [Discord Developer Portal](https://discord.com/developers), in your app and bot's settings and when creating the bot invite link there.
 
-- `BOT_TOKEN` must be put in a `.env` file (like [`.env_template`](/.env_template)), from your bot's settings in the Discord Developer Portal.
+> - `BOT_TOKEN` must be put in a `.env` file (like [`.env_template`](/.env_template)), from your bot's settings in the Discord Developer Portal.
+- `BOT_TOKEN` must be put in a `Secrets.toml` file (like [`Secrets_template.toml`](/Secrets_template.toml)), from your bot's settings in the Discord Developer Portal.
 
 ## *️⃣ Versions:
 - [Python](https://github.com/LucasPlacentino/iasked-bot/tree/python) using [_Disnake_](https://github.com/DisnakeDev/disnake)
