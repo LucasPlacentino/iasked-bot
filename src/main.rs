@@ -1,14 +1,36 @@
-use std::env;
+//use std::env;
+
+use anyhow::anyhow;
+use rand::Rng;
 
 use serenity::async_trait;
 use serenity::model::channel::Message;
 use serenity::model::gateway::Ready;
 use serenity::prelude::*;
+use shuttle_secrets::SecretStore;
+use tracing::{error, info};
 
-struct Handler;
+//struct Handler;
+struct Bot;
+
+const MESSAGES: [&str; 11] = [
+    "Who asked?",
+    "Who asked",
+    "who asked?",
+    "who asked",
+    "Who asked?",
+    "who asked",
+    "Who asked",
+    "whoasked",
+    "whoasked?",
+    "Whoasked",
+    "Whoasked?",
+];
+
+const REPLIES: [&str; 3] = ["I asked", "I did", "Me"];
 
 #[async_trait]
-impl EventHandler for Handler {
+impl EventHandler for Bot {
     // Set a handler for the `message` event - so that whenever a new message
     // is received - the closure (or function) passed will be called.
     //
@@ -19,6 +41,16 @@ impl EventHandler for Handler {
             return;
         }
 
+        if MESSAGES.contains(&msg.content.as_str()) {
+            let reply = REPLIES[rand::thread_rng().gen_range(0..REPLIES.len())];
+            if let Err(why) = msg.reply(&ctx.http, reply).await {
+                println!("> Error sending message: {:?}", why);
+            }
+            if let Err(why) = msg.react(&ctx.http, '🙋').await {
+                println!("> Error reacting to message: {:?}", why);
+            }
+        }
+        /*
         if msg.content == "Who asked?" {
             // Sending a message can fail, due to a network error, an
             // authentication error, or lack of permissions to post in the
@@ -28,6 +60,7 @@ impl EventHandler for Handler {
                 println!("> Error sending message: {:?}", why);
             }
         }
+        */
     }
 
     // Set a handler to be called on the `ready` event. This is called when a
@@ -41,10 +74,19 @@ impl EventHandler for Handler {
     }
 }
 
+/*
 #[tokio::main]
 async fn main() {
     // Configure the client with your Discord bot token in the environment.
+    /*
     let token = env::var("BOT_TOKEN").expect("> Expected a token in the environment");
+    */
+    let token = if let Some(token) = secret_store.get("BOT_TOKEN") {
+        token
+    } else {
+        return Err(anyhow!("'DISCORD_TOKEN' was not found").into());
+    };
+
     // Set gateway intents, which decides what events the bot will be notified about
     let intents = GatewayIntents::GUILD_MESSAGES
         | GatewayIntents::DIRECT_MESSAGES
@@ -65,4 +107,33 @@ async fn main() {
     if let Err(why) = client.start().await {
         println!("> Client error: {:?}", why);
     }
+*/
+
+#[shuttle_runtime::main]
+async fn serenity(
+    #[shuttle_secrets::Secrets] secret_store: SecretStore,
+) -> shuttle_serenity::ShuttleSerenity {
+    // Get the discord token set in `Secrets.toml`
+    let token = if let Some(token) = secret_store.get("BOT_TOKEN") {
+        token
+    } else {
+        return Err(anyhow!("> 'BOT_TOKEN' was not found").into());
+    };
+
+    // Set gateway intents, which decides what events the bot will be notified about
+    let intents = GatewayIntents::GUILD_MESSAGES
+        | GatewayIntents::DIRECT_MESSAGES
+        | GatewayIntents::MESSAGE_CONTENT;
+
+    let client = Client::builder(&token, intents)
+        .event_handler(Bot)
+        .await
+        .expect("> Err creating client");
+
+    /*
+    if let Err(why) = client.start().await {
+        println!("> Client error: {:?}", why);
+    }
+    */
+    Ok(client.into())
 }
