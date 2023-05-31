@@ -1,0 +1,14 @@
+version: '3.9' # 3.5 if we use it on CentOS 7
+services:
+  IAskedDiscordBot:
+    image: lucasplacentino/iaskeddiscordbot:latest # or other version
+    container_name: IAskedDiscordBot
+    #build:
+    #  context: .
+    #  image: iaskeddiscordbot
+    #  dockerfile: Dockerfile
+    env_file:
+      - .env
+    volumes:
+      - ./:./
+    restart: always # or unless-stopped
