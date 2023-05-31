@@ -17,6 +17,12 @@ This can be enabled in your [Discord Developer Portal](https://discord.com/devel
 > - On Windows: in Powershell (Windows Terminal) run `$env:BOT_TOKEN="<your_bot_token>"`.  
 > - On Linux: in terminal run `export BOT_TOKEN="your_bot_token"`.
 
+- Install [Shuttle](https://docs.shuttle.rs/) and login through the CLI.
+
+- Run `cargo shuttle project start --idle-minutes 0` in the base folder of this repo.  
+- Then you can test locally using `cargo shuttle run`.  
+- Finally you can deploy the bot to Shuttle using `cargo shuttle deploy`!
+
 ## *️⃣ Versions:
 - [Python](https://github.com/LucasPlacentino/iasked-bot/tree/python) using [_Disnake_](https://github.com/DisnakeDev/disnake) running on Docker
 - [Javascript](https://github.com/LucasPlacentino/iasked-bot/tree/javascript) using [_Discord.js_](https://github.com/discordjs/discord.js) running/hosted on [**Glitch**?](TODO)
