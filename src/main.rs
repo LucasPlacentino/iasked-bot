@@ -15,10 +15,10 @@ impl EventHandler for Handler {
     // Event handlers are dispatched through a threadpool, and so multiple
     // events can be dispatched simultaneously.
     async fn message(&self, ctx: Context, msg: Message) {
-        if msg.is_own(&ctx) {
+        if msg.is_own(&ctx.cache) {
             return;
         }
-        
+
         if msg.content == "Who asked?" {
             // Sending a message can fail, due to a network error, an
             // authentication error, or lack of permissions to post in the
@@ -53,8 +53,10 @@ async fn main() {
     // Create a new instance of the Client, logging in as a bot. This will
     // automatically prepend your bot token with "Bot ", which is a requirement
     // by Discord for bot users.
-    let mut client =
-        Client::builder(&token, intents).event_handler(Handler).await.expect("> Err creating client");
+    let mut client = Client::builder(&token, intents)
+        .event_handler(Handler)
+        .await
+        .expect("> Err creating client");
 
     // Finally, start a single shard, and start listening to events.
     //
