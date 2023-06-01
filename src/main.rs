@@ -8,10 +8,14 @@ use serenity::model::channel::Message;
 use serenity::model::gateway::Ready;
 use serenity::prelude::*;
 use shuttle_secrets::SecretStore;
-use tracing::{error, info};
+//use tracing::{error, info};
+use serenity::model::application::interaction::{Interaction, InteractionResponseType};
+use serenity::model::id::GuildId;
 
 //struct Handler;
-struct Bot;
+struct Bot{
+    guild_id: String
+}
 
 const MESSAGES: [&str; 11] = [
     "Who asked?",
@@ -69,8 +73,45 @@ impl EventHandler for Bot {
     // private channels, and more.
     //
     // In this case, just print what the current user's username is.
-    async fn ready(&self, _: Context, ready: Ready) {
+    async fn ready(&self, ctx: Context, ready: Ready) {
         println!("> {} is connected!", ready.user.name);
+    
+        let guild_id = GuildId(self.guild_id.parse().unwrap());
+        // Get the guild_id set in `Secrets.toml`
+
+        let commands =
+            GuildId::set_application_commands(&guild_id, &ctx.http, |commands| {
+                commands
+                    .create_application_command(|command| {
+                        command.name("iasked").description("Say I asked")
+                    })
+            })
+            .await
+            .unwrap();
+
+        println!("Registered commands: {:#?}", commands);
+    }
+
+    async fn interaction_create(&self, ctx: Context, interaction: Interaction) {
+        if let Interaction::ApplicationCommand(command) = interaction {
+            println!("> Received command interaction: {:#?}", command);
+
+            let response_content = match command.data.name.as_str() {
+                "iasked" => "I asked".to_owned(),
+                command => unreachable!("> Unknown command: {}", command),
+            };
+
+            let create_interaction_response =
+                command.create_interaction_response(&ctx.http, |response| {
+                    response
+                        .kind(InteractionResponseType::ChannelMessageWithSource)
+                        .interaction_response_data(|message| message.content(response_content))
+                });
+
+            if let Err(why) = create_interaction_response.await {
+                println!("> Cannot respond to slash command: {}", why);
+            }
+        }
     }
 }
 
@@ -119,14 +160,24 @@ async fn serenity(
     } else {
         return Err(anyhow!("> 'BOT_TOKEN' was not found").into());
     };
+    // Get the guild_id set in `Secrets.toml`
+    let guild_id = if let Some(guild_id) = secret_store.get("GUILD_ID") {
+        guild_id
+    } else {
+        return Err(anyhow!("> 'GUILD_ID' was not found").into());
+    };
 
     // Set gateway intents, which decides what events the bot will be notified about
     let intents = GatewayIntents::GUILD_MESSAGES
         | GatewayIntents::DIRECT_MESSAGES
         | GatewayIntents::MESSAGE_CONTENT;
 
+    let bot = Bot{
+        guild_id
+    };
+
     let client = Client::builder(&token, intents)
-        .event_handler(Bot)
+        .event_handler(bot)
         .await
         .expect("> Err creating client");
 
